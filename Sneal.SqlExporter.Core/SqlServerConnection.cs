@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
-using Sneal.Preconditions;
+using Sneal.SqlExporter.Core.Preconditions;
 
 namespace Sneal.SqlExporter
 {

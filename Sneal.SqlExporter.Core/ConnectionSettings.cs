@@ -1,4 +1,4 @@
-using Sneal.Preconditions;
+using Sneal.SqlExporter.Core.Preconditions;
 
 namespace Sneal.SqlExporter.Core
 {

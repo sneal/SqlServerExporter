@@ -52,6 +52,9 @@
     <Compile Include="ExportParams.cs" />
     <Compile Include="ExportSession.cs" />
     <Compile Include="ExportSessionFactory.cs" />
+    <Compile Include="Preconditions\Precondition.cs" />
+    <Compile Include="Preconditions\StringPrecondition.cs" />
+    <Compile Include="Preconditions\Throw.cs" />
     <Compile Include="ScriptWriterFactory.cs" />
     <Compile Include="IConnectionSettings.cs" />
     <Compile Include="IExportParams.cs" />
@@ -66,12 +69,6 @@
     <Compile Include="SqlExporterConnectionException.cs" />
     <Compile Include="SqlExporterException.cs" />
     <Compile Include="SqlServerConnection.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Preconditions\Sneal.Preconditions\Sneal.Preconditions.csproj">
-      <Project>{55709bd5-0c28-4494-a7a9-4af15bb62131}</Project>
-      <Name>Sneal.Preconditions</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

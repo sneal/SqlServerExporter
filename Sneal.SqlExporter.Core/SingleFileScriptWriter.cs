@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using Sneal.Preconditions;
+using Sneal.SqlExporter.Core.Preconditions;
 
 namespace Sneal.SqlExporter.Core
 {

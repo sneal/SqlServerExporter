@@ -122,9 +122,6 @@
     <Content Include="ExportSql.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\sneal.snk">
-      <Link>sneal.snk</Link>
-    </None>
     <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
