@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.SqlServer.Management.Smo;
+using Sneal.SqlExporter.Core.Engine;
 using Sneal.SqlExporter.Core.Preconditions;
 
 namespace Sneal.SqlExporter.Core

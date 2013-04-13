@@ -14,14 +14,11 @@ namespace Sneal.SqlExporter.Core
             UseMultipleFiles = true;
         }
 
-        #region IExportParams Members
-
         public bool ScriptTableSchema { get; set; }
 
         public bool ScriptTableConstraints { get; set; }
 
         public bool ScriptTableIndexes { get; set; }
-
 
         public bool ScriptDataAsSql { get; set; }
 
@@ -50,7 +47,5 @@ namespace Sneal.SqlExporter.Core
         {
             get { return viewsToScript; }
         }
-
-        #endregion
     }
 }

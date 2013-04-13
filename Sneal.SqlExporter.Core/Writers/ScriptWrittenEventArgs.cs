@@ -1,6 +1,6 @@
 using System;
 
-namespace Sneal.SqlExporter.Core
+namespace Sneal.SqlExporter.Core.Writers
 {
     public class ScriptWrittenEventArgs : EventArgs
     {

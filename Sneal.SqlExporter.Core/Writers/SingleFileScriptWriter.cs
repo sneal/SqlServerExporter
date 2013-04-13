@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using Sneal.SqlExporter.Core.Engine;
 using Sneal.SqlExporter.Core.Preconditions;
 
-namespace Sneal.SqlExporter.Core
+namespace Sneal.SqlExporter.Core.Writers
 {
-    public class SingleFileScriptWriter : IScriptWriter
+    internal class SingleFileScriptWriter : IScriptWriter
     {
         private string _exportDirectory;
         private readonly string _dbName;

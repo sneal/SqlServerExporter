@@ -1,6 +1,6 @@
-namespace Sneal.SqlExporter.Core
+namespace Sneal.SqlExporter.Core.Engine
 {
-    public enum ExportObjectType
+    internal enum ExportObjectType
     {
         Table,
         View,

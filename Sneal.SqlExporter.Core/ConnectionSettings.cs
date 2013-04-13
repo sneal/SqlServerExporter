@@ -4,41 +4,22 @@ namespace Sneal.SqlExporter.Core
 {
     public class ConnectionSettings : IConnectionSettings
     {
-        private string password;
         private string serverName;
-        private bool useIntegratedAuthentication;
-        private string userName;
-
-        #region IConnectionSettings Members
-
-        public string Password
-        {
-            get { return password; }
-            set { password = value; }
-        }
 
         public string ServerName
         {
             get { return serverName; }
             set
             {
-                Throw.If(value).IsEmpty();
+                Throw.If(value).IsNullOrEmpty();
                 serverName = value;
             }
         }
 
-        public bool UseIntegratedAuthentication
-        {
-            get { return useIntegratedAuthentication; }
-            set { useIntegratedAuthentication = value; }
-        }
+        public string Password { get; set; }
 
-        public string UserName
-        {
-            get { return userName; }
-            set { userName = value; }
-        }
+        public bool UseIntegratedAuthentication { get; set; }
 
-        #endregion
+        public string UserName { get; set; }
     }
 }

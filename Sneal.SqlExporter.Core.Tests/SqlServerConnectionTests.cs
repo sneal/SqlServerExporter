@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SharpTestsEx;
+using Sneal.SqlExporter.Core.Engine;
 
 namespace Sneal.SqlExporter.Core.Tests
 {

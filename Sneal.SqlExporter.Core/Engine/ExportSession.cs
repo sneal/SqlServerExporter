@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using Microsoft.SqlServer.Management.Smo;
 using Sneal.SqlExporter.Core.Preconditions;
+using Sneal.SqlExporter.Core.Writers;
 
-namespace Sneal.SqlExporter.Core
+namespace Sneal.SqlExporter.Core.Engine
 {
     internal class ExportSession : IExportSession
     {

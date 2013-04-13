@@ -4,7 +4,7 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 using Sneal.SqlExporter.Core.Preconditions;
 
-namespace Sneal.SqlExporter
+namespace Sneal.SqlExporter.Core.Engine
 {
     /// <summary>
     /// Connects to stuff

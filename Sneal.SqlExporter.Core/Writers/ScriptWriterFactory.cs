@@ -1,6 +1,6 @@
-﻿namespace Sneal.SqlExporter.Core
+﻿namespace Sneal.SqlExporter.Core.Writers
 {
-    public class ScriptWriterFactory
+    internal class ScriptWriterFactory
     {
         public IScriptWriter Create(string exportDirectory, string databaseName, bool useMultipleFiles)
         {

@@ -5,7 +5,7 @@ namespace Sneal.SqlExporter.Core
     public class ProgressEventArgs : EventArgs
     {
         private readonly string objectName;
-        private readonly ushort percentDone;
+        private readonly int percentDone;
 
         public ProgressEventArgs(ushort percentDone, string objectName)
         {
@@ -13,7 +13,7 @@ namespace Sneal.SqlExporter.Core
             this.objectName = objectName;
         }
 
-        public ProgressEventArgs(ushort percentDone)
+        public ProgressEventArgs(int percentDone)
         {
             this.percentDone = percentDone;
         }
@@ -23,7 +23,7 @@ namespace Sneal.SqlExporter.Core
             get { return objectName; }
         }
 
-        public ushort PercentDone
+        public int PercentDone
         {
             get { return percentDone; }
         }
