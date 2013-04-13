@@ -12,7 +12,6 @@ namespace Sneal.SqlExporter.Core
 
         bool UseMultipleFiles { get; }
         string ExportDirectory { get; }
-        string DatabaseName { get; }
 
         IList<string> TablesToScriptData { get; }
         IList<string> SprocsToScript { get; }

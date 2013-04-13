@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Sneal.SqlExporter.Core
 {
-    public interface IExportSession : IDisposable
+    public interface IExportSession
     {
         string DatabaseName { get; }
 
@@ -16,6 +16,6 @@ namespace Sneal.SqlExporter.Core
         IList<string> GetUserSprocs();
         IList<string> GetUserViews();
 
-        void Export(string exportDirectory, IExportParams exportParams);
+        void Export(IExportParams exportParams);
     }
 }

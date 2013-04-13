@@ -7,14 +7,9 @@ using Sneal.SqlExporter.Core.Preconditions;
 namespace Sneal.SqlExporter.Core
 {
     /// <summary>
-    /// This scripter implmentation script out the specified objects to separate
-    /// SQL script files in distinct sub-folders.  This scripter should
-    /// generally be used to check in SQL script into a source control system.
+    /// Scripts the specified SQL Server objects.
     /// </summary>
-    /// <remarks>
-    /// This class is definately not thread safe.
-    /// </remarks>
-    public class ScriptEngine
+    internal class ScriptEngine
     {
         protected readonly Database database;
         protected int exportObjectCount;

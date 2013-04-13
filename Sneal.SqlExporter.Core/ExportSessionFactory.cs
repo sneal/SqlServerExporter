@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.SqlServer.Management.Smo;
 using Sneal.SqlExporter.Core.Preconditions;
 
 namespace Sneal.SqlExporter.Core
@@ -13,54 +14,41 @@ namespace Sneal.SqlExporter.Core
         {
             Throw.If(settings).IsNull();
             Throw.If(settings.ServerName).IsEmpty();
-
             _settings = settings;
-
-            CreateConnection();
         }
 
-        protected void CreateConnection()
+        public IExportSession CreateExportSession(string databaseName)
         {
-            try
-            {
-                _connection = _settings.UseIntegratedAuthentication ?
-                    new SqlServerConnection(_settings.ServerName) :
-                    new SqlServerConnection(_settings.ServerName, _settings.UserName, _settings.Password);
+            Throw.If(databaseName).IsNullOrEmpty();
 
-                _connection.Connect();
-            }
-            catch (Exception ex)
-            {
-                string msg = string.Format(
-                    "There was an error while trying to connect to the SQL Server {0}",
-                    _settings.ServerName);
-                throw new SqlExporterConnectionException(msg, ex);
-            }            
-        }
-
-        public virtual IExportSession CreateExportSession(string database)
-        {
-            Throw.If(database).IsEmpty();
+            Database database;
 
             try
             {
-                IExportSession exportSession = new ExportSession(_connection, database);
-                return exportSession;
+                database = GetConnection().GetDatabase(databaseName);
             }
             catch (Exception ex)
             {
-                string msg = string.Format(
-                    "There was an error while trying to connect to the database {1} on server {0}",
-                    database, _settings.ServerName);
-                throw new SqlExporterConnectionException(msg, ex);
+                throw new SqlExporterConnectionException(
+                    string.Format("Could not find or connect to the database {0} on server {1}",
+                    databaseName, _settings.ServerName), ex);
             }
+
+            if (database == null)
+            {
+                throw new SqlExporterConnectionException(
+                    string.Format("Could not find or connect to the database {0} on server {1}",
+                    databaseName, _settings.ServerName));
+            }
+
+            return new ExportSession(database);
         }
 
         public IList<string> GetDatabaseNames()
         {
             try
             {
-                return _connection.GetDatabaseNames();
+                return GetConnection().GetDatabaseNames();
             }
             catch (Exception ex)
             {
@@ -68,6 +56,32 @@ namespace Sneal.SqlExporter.Core
                     "There was an error while trying to connect to enumerate the databases on server {0}",
                     _settings.ServerName);
                 throw new SqlExporterException(msg, ex);                
+            }
+        }
+
+        private SqlServerConnection GetConnection()
+        {
+            return _connection ?? (_connection = CreateConnection());
+        }
+
+        private SqlServerConnection CreateConnection()
+        {
+            try
+            {
+                var connection = _settings.UseIntegratedAuthentication ?
+                    new SqlServerConnection(_settings.ServerName) :
+                    new SqlServerConnection(_settings.ServerName, _settings.UserName, _settings.Password);
+
+                connection.Connect();
+
+                return connection;
+            }
+            catch (Exception ex)
+            {
+                string msg = string.Format(
+                    "There was an error while trying to connect to the SQL Server {0}",
+                    _settings.ServerName);
+                throw new SqlExporterConnectionException(msg, ex);
             }
         }
     }

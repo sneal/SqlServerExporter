@@ -10,6 +10,10 @@ namespace Sneal.SqlExporter
     /// </summary>
     public class Form1 : Form
     {
+        private ExportSessionFactory _exportFactory;
+        private IExportSession _exportSession;
+        private UserPrefsRepository _prefsRepository = new UserPrefsRepository();
+
         private Button btnExportButton;
         private Button btnSelectExportDir;
         private CheckBox chkConstraints;
@@ -40,11 +44,8 @@ namespace Sneal.SqlExporter
         private TextBox txtPassword;
         private TextBox txtServer;
         private TextBox txtUserName;
-
-        private IExportSession exportSession;
         private RadioButton rdoSingleFile;
         private RadioButton rdoMultipleFiles;
-        private ExportSessionFactory exportFactory;
 
         public Form1()
         {
@@ -90,18 +91,25 @@ namespace Sneal.SqlExporter
 
         private void LoadUserPreferences()
         {
-            UserPrefsRepository prefsRepository = new UserPrefsRepository();
-            UserPrefs prefs = prefsRepository.LoadUserPrefs();
+            UserPrefs prefs = _prefsRepository.LoadUserPrefs();
 
             if (!string.IsNullOrEmpty(prefs.ExportDirectory))
+            {
                 txtExportRootDir.Text = prefs.ExportDirectory;
+            }
             else
+            {
                 txtExportRootDir.Text = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            }
 
             if (!string.IsNullOrEmpty(prefs.Server))
+            {
                 txtServer.Text = prefs.Server;
+            }
             else
+            {
                 txtServer.Text = Environment.MachineName;
+            }
         }
 
         /// <summary>
@@ -124,37 +132,11 @@ namespace Sneal.SqlExporter
 
         private void ExportScripts()
         {
-            ExportParams exportParams = new ExportParams();
-            exportParams.UseMultipleFiles = false;  // for now this always must be true
-
-            exportParams.ScriptDataAsSql = chkDataSql.Checked;
-            exportParams.ScriptDataAsXml = chkDataXml.Checked;
-            exportParams.ScriptTableSchema = chkSchema.Checked;
-            exportParams.ScriptTableConstraints = chkConstraints.Checked;
-            exportParams.ScriptTableIndexes = chkIndex.Checked;
-
-            if (exportParams.ScriptDataAsSql || exportParams.ScriptDataAsXml)
-            {
-                foreach (string table in lstTable.SelectedItems)
-                    exportParams.TablesToScriptData.Add(table);
-            }
-
-            foreach (string sproc in lstSproc.SelectedItems)
-                exportParams.SprocsToScript.Add(sproc);
-
-            foreach (string table in lstTable.SelectedItems)
-                exportParams.TablesToScript.Add(table);
-
-            foreach (string view in lstView.SelectedItems)
-                exportParams.ViewsToScript.Add(view);
-
-            exportParams.UseMultipleFiles = rdoMultipleFiles.Checked;
-            exportParams.DatabaseName = exportSession.DatabaseName;
-            exportParams.ExportDirectory = txtExportRootDir.Text;
+            var exportParams = CreateExportParamsFromUI();
 
             try
             {
-                exportSession.Export(txtExportRootDir.Text, exportParams);
+                _exportSession.Export(exportParams);
             }
             catch (SqlExporterException ex)
             {
@@ -162,14 +144,49 @@ namespace Sneal.SqlExporter
             }
         }
 
+        private ExportParams CreateExportParamsFromUI()
+        {
+            var exportParams = new ExportParams();
+            exportParams.ScriptDataAsSql = chkDataSql.Checked;
+            exportParams.ScriptDataAsXml = chkDataXml.Checked;
+            exportParams.ScriptTableSchema = chkSchema.Checked;
+            exportParams.ScriptTableConstraints = chkConstraints.Checked;
+            exportParams.ScriptTableIndexes = chkIndex.Checked;
+            exportParams.UseMultipleFiles = rdoMultipleFiles.Checked;
+            exportParams.ExportDirectory = txtExportRootDir.Text;
+
+            if (exportParams.ScriptDataAsSql || exportParams.ScriptDataAsXml)
+            {
+                foreach (string table in lstTable.SelectedItems)
+                {
+                    exportParams.TablesToScriptData.Add(table);
+                }
+            }
+
+            foreach (string sproc in lstSproc.SelectedItems)
+            {
+                exportParams.SprocsToScript.Add(sproc);
+            }
+
+            foreach (string table in lstTable.SelectedItems)
+            {
+                exportParams.TablesToScript.Add(table);
+            }
+
+            foreach (string view in lstView.SelectedItems)
+            {
+                exportParams.ViewsToScript.Add(view);
+            }
+            return exportParams;
+        }
+
         private void SaveUserPreferences()
         {
-            UserPrefs prefs = new UserPrefs();
+            var prefs = new UserPrefs();
             prefs.Server = txtServer.Text;
             prefs.ExportDirectory = txtExportRootDir.Text;
 
-            UserPrefsRepository prefsRepository = new UserPrefsRepository();
-            prefsRepository.SaveUserPrefs(prefs);
+            _prefsRepository.SaveUserPrefs(prefs);
         }
 
         private static void ShowError(string msg)
@@ -183,8 +200,10 @@ namespace Sneal.SqlExporter
         /// </summary>
         private void FillTableList()
         {
-            foreach (string table in exportSession.GetUserTables())
-                lstTable.Items.Add(table);            
+            foreach (string table in _exportSession.GetUserTables())
+            {
+                lstTable.Items.Add(table);
+            }
         }
 
         /// <summary>
@@ -193,8 +212,10 @@ namespace Sneal.SqlExporter
         /// </summary>
         private void FillSprocList()
         {
-            foreach (string sproc in exportSession.GetUserSprocs())
+            foreach (string sproc in _exportSession.GetUserSprocs())
+            {
                 lstSproc.Items.Add(sproc);
+            }
         }
 
         /// <summary>
@@ -202,8 +223,10 @@ namespace Sneal.SqlExporter
         /// </summary>
         private void FillViewList()
         {
-            foreach (string view in exportSession.GetUserViews())
+            foreach (string view in _exportSession.GetUserViews())
+            {
                 lstView.Items.Add(view);
+            }
         }
 
         /// <summary>
@@ -213,7 +236,7 @@ namespace Sneal.SqlExporter
         {
             selExportDatabaseList.Items.Clear();
 
-            ConnectionSettings settings = new ConnectionSettings();
+            var settings = new ConnectionSettings();
             settings.ServerName = txtServer.Text;
             settings.Password = txtPassword.Text;
             settings.UserName = txtUserName.Text;
@@ -221,15 +244,20 @@ namespace Sneal.SqlExporter
 
             try
             {
-                exportFactory = new ExportSessionFactory(settings);
+                _exportFactory = new ExportSessionFactory(settings);
             }
             catch (SqlExporterConnectionException ex)
             {
                 ShowError(ex.Message);
                 return;
             }
+            catch (Exception ex)
+            {
+                ShowError("An unexpected error occured - " + ex.Message);
+                return;
+            }
 
-            foreach (string db in exportFactory.GetDatabaseNames())
+            foreach (string db in _exportFactory.GetDatabaseNames())
             {
                 selExportDatabaseList.Items.Add(db);
             }
@@ -248,11 +276,8 @@ namespace Sneal.SqlExporter
 
             try
             {
-                if (exportSession != null)
-                    exportSession.Dispose();
-
-                exportSession = exportFactory.CreateExportSession(SelectedDatabaseName);
-                exportSession.ProgressEvent += ExportSession_ProgressEvent;
+                _exportSession = _exportFactory.CreateExportSession(SelectedDatabaseName);
+                _exportSession.ProgressEvent += ExportSession_ProgressEvent;
             }
             catch (SqlExporterException ex)
             {

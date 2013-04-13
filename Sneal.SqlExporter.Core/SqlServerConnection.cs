@@ -16,9 +16,6 @@ namespace Sneal.SqlExporter
         private readonly string _password;
         private Server _server;
 
-        // has this been garbage collected?
-        private bool _disposed = false;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlServerConnection"/> class.
         /// Use this constructor when needing to use integrated authentication under
@@ -95,36 +92,5 @@ namespace Sneal.SqlExporter
 
             _server = new Server(serverConnection);
         }
-
-        #region IDisposable Members
-
-        /// Ensure you call this when you are finished impersonating the
-        /// user.  This will logoff the runas user and revert subsequent
-        /// code to the original user context.  Same as Logout().
-        public void Dispose()
-        {
-            // free resources
-            Dispose(true);
-
-            // object resource were already freed, remove
-            // this object from the GC finalizer list
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Does the actual resource freeing
-        /// </summary>
-        /// <param name="disposing">False if method called from the finalizer</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-
-            }
-
-            _disposed = true;
-        }
-
-        #endregion
     }
 }

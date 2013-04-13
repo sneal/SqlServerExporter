@@ -2,13 +2,13 @@
 {
     public class ScriptWriterFactory
     {
-        public IScriptWriter Create(IExportParams exportParams)
+        public IScriptWriter Create(string exportDirectory, string databaseName, bool useMultipleFiles)
         {
-            if (exportParams.UseMultipleFiles)
+            if (useMultipleFiles)
             {
-                return new MultiFileScriptWriter(exportParams.ExportDirectory);
+                return new MultiFileScriptWriter(exportDirectory);
             }
-            return new SingleFileScriptWriter(exportParams.ExportDirectory, exportParams.DatabaseName);
+            return new SingleFileScriptWriter(exportDirectory, databaseName);
         }
     }
 }

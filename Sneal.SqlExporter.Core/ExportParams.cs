@@ -27,8 +27,6 @@ namespace Sneal.SqlExporter.Core
 
         public bool ScriptDataAsXml { get; set; }
 
-        public string DatabaseName { get; set; }
-
         public bool UseMultipleFiles { get; set; }
 
         public string ExportDirectory { get; set; }

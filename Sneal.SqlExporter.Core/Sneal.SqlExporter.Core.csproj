@@ -47,7 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConnectionSettings.cs" />
-    <Compile Include="DifferencingScriptEngine.cs" />
     <Compile Include="ExportObjectType.cs" />
     <Compile Include="ExportParams.cs" />
     <Compile Include="ExportSession.cs" />

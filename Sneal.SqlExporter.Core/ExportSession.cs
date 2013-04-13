@@ -5,36 +5,14 @@ using Sneal.SqlExporter.Core.Preconditions;
 
 namespace Sneal.SqlExporter.Core
 {
-    public class ExportSession : IExportSession
+    internal class ExportSession : IExportSession
     {
-        private readonly SqlServerConnection connection;
-        private readonly Database database;
-        private bool disposed;
+        private readonly Database _database;
 
-        public ExportSession(SqlServerConnection connection, string databaseName)
+        internal ExportSession(Database database)
         {
-            Throw.If(connection).IsNull();
-            Throw.If(databaseName).IsEmpty();
-
-            this.connection = connection;
-
-            try
-            {
-                database = connection.GetDatabase(databaseName);
-            }
-            catch (Exception ex)
-            {
-                throw new SqlExporterConnectionException(
-                    string.Format("Could not find or connect to the database {0} on server {1}",
-                    databaseName, connection.Name), ex);                
-            }
-
-            if (database == null)
-            {
-                throw new SqlExporterConnectionException(
-                    string.Format("Could not find or connect to the database {0} on server {1}",
-                    databaseName, connection.Name));
-            }
+            Throw.If(database).IsNull();
+            _database = database;
         }
 
         /// <summary>
@@ -42,7 +20,7 @@ namespace Sneal.SqlExporter.Core
         /// </summary>
         public string DatabaseName
         {
-            get { return database.Name; }
+            get { return _database.Name; }
         }
 
         /// <summary>
@@ -53,10 +31,12 @@ namespace Sneal.SqlExporter.Core
         public IList<string> GetUserTables()
         {
             List<string> tables = new List<string>();
-            foreach (Table table in database.Tables)
+            foreach (Table table in _database.Tables)
             {
                 if (!table.IsSystemObject)
+                {
                     tables.Add(table.Name);
+                }
             }
 
             return tables;
@@ -65,10 +45,12 @@ namespace Sneal.SqlExporter.Core
         public IList<string> GetUserSprocs()
         {
             List<string> sprocs = new List<string>();
-            foreach (StoredProcedure sproc in database.StoredProcedures)
+            foreach (StoredProcedure sproc in _database.StoredProcedures)
             {
                 if (!sproc.IsSystemObject && !sproc.Name.StartsWith("dt"))
+                {
                     sprocs.Add(sproc.Name);
+                }
             }
 
             return sprocs;
@@ -77,7 +59,7 @@ namespace Sneal.SqlExporter.Core
         public IList<string> GetUserViews()
         {
             List<string> views = new List<string>();
-            foreach (View view in database.Views)
+            foreach (View view in _database.Views)
             {
                 if (!view.Name.StartsWith("sys"))
                 {
@@ -88,28 +70,25 @@ namespace Sneal.SqlExporter.Core
             return views;
         }
 
-        public void Export(string exportDirectory, IExportParams exportParams)
+        public void Export(IExportParams exportParams)
         {
             ScriptEngine engine = null;
             try
             {
-                var scriptWriter = new ScriptWriterFactory().Create(exportParams);
+                var scriptWriter = new ScriptWriterFactory().Create(
+                    exportParams.ExportDirectory, DatabaseName, exportParams.UseMultipleFiles);
 
-                engine = new ScriptEngine(database);
+                engine = new ScriptEngine(_database);
                 engine.ProgressEvent += Engine_ProgressEvent;
                 engine.ExportScripts(exportParams, scriptWriter);
             }
             finally
             {
                 if (engine != null)
+                {
                     engine.ProgressEvent -= Engine_ProgressEvent;
+                }
             }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         protected virtual void OnProgressEvent(ProgressEventArgs e)
@@ -125,17 +104,6 @@ namespace Sneal.SqlExporter.Core
         {
             // forward the event from the engine to session listeners
             OnProgressEvent(e);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed && disposing)
-            {
-                if (connection != null)
-                    connection.Dispose();
-            }
-
-            disposed = true;
         }
     }
 }
